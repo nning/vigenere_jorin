@@ -1,9 +1,6 @@
-package main
+package vigenere_jorin
 
 import (
-	"fmt"
-	"os"
-	"strconv"
 	"strings"
 )
 
@@ -40,7 +37,7 @@ func RotateLeft(a, b rune) rune {
 	return rune(ALPHABET[(ai-bi+ALPHABET_LEN)%ALPHABET_LEN])
 }
 
-func Encrypt(key []rune, msg []rune) []rune {
+func RoundRight(key, msg []rune) []rune {
 	out := make([]rune, 0, len(msg))
 
 	ki := 0
@@ -63,7 +60,7 @@ func Encrypt(key []rune, msg []rune) []rune {
 	return out
 }
 
-func Decrypt(key []rune, msg []rune) []rune {
+func RoundLeft(key, msg []rune) []rune {
 	out := make([]rune, 0, len(msg))
 
 	ki := 0
@@ -86,35 +83,36 @@ func Decrypt(key []rune, msg []rune) []rune {
 	return out
 }
 
-func main() {
-	if len(os.Args) != 4 && len(os.Args) != 5 {
-		fmt.Fprintf(os.Stderr, "%s encrypt|decrypt <key> <message> [rounds]\n", os.Args[0])
-		os.Exit(1)
-	}
+func Encrypt(key, msg []rune, rounds ...int) []rune {
+	rds := 1
 
-	key := Sanitize(os.Args[2])
-	msg := Sanitize(os.Args[3])
-
-	rounds := 1
-
-	if len(os.Args) == 5 {
-		rounds, _ = strconv.Atoi(os.Args[4])
+	if len(rounds) > 0 {
+		rds = rounds[0]
 	}
 
 	out := make([]rune, len(msg))
 	copy(out, msg)
 
-	if os.Args[1] == "encrypt" {
-		for i := 0; i < rounds; i++ {
-			out = Encrypt(key, out)
-		}
+	for i := 0; i < rds; i++ {
+		out = RoundRight(key, out)
 	}
 
-	if os.Args[1] == "decrypt" {
-		for i := 0; i < rounds; i++ {
-			out = Decrypt(key, out)
-		}
+	return out
+}
+
+func Decrypt(key, msg []rune, rounds ...int) []rune {
+	rds := 1
+
+	if len(rounds) > 0 {
+		rds = rounds[0]
 	}
 
-	fmt.Println(string(out))
+	out := make([]rune, len(msg))
+	copy(out, msg)
+
+	for i := 0; i < rds; i++ {
+		out = RoundLeft(key, out)
+	}
+
+	return out
 }
