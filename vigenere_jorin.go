@@ -2,6 +2,7 @@ package vigenere_jorin
 
 import (
 	"strings"
+	"unicode"
 )
 
 // Alphabet contains set of possible runes: [A-Z ]
@@ -18,10 +19,14 @@ func Sanitize(in string) []rune {
 	out := []rune{}
 
 	for _, v := range in {
-		if 65 <= v && v <= 90 || v == 32 {
+		if strings.IndexRune(Alphabet, v) > -1 {
 			out = append(out, v)
-		} else if 97 <= v && v <= 122 {
-			out = append(out, v-32)
+		} else {
+			vu := unicode.ToUpper(v)
+
+			if strings.IndexRune(Alphabet, vu) > -1 {
+				out = append(out, vu)
+			}
 		}
 	}
 
