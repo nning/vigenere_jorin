@@ -3,9 +3,10 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"nning.io/go/vigenere_jorin"
 	"os"
 	"strconv"
+
+	"nning.io/go/vigenere_jorin"
 )
 
 func main() {

@@ -4,11 +4,16 @@ import (
 	"strings"
 )
 
-// Set of possible runes: [A-Z ]
-const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ "
-const ALPHABET_LEN = len(ALPHABET)
+// Alphabet contains set of possible runes: [A-Z ]
+const Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ "
 
-// Converts lower to upper case and removes non-runes but keeps space
+// AlphabetLen is length of Alphabet
+const AlphabetLen = len(Alphabet)
+
+// KeyPositionReset controls whether Key Position Reset is activated
+const KeyPositionReset = true
+
+// Sanitize converts lower to upper case and removes non-runes but keeps space
 func Sanitize(in string) []rune {
 	out := []rune{}
 
@@ -23,20 +28,23 @@ func Sanitize(in string) []rune {
 	return out
 }
 
+// RotateRight rotates one rune for encryption
 func RotateRight(a, b rune) rune {
-	ai := strings.IndexRune(ALPHABET, a)
-	bi := strings.IndexRune(ALPHABET, b)
+	ai := strings.IndexRune(Alphabet, a)
+	bi := strings.IndexRune(Alphabet, b)
 
-	return rune(ALPHABET[(ai+bi)%ALPHABET_LEN])
+	return rune(Alphabet[(ai+bi)%AlphabetLen])
 }
 
+// RotateLeft rotates one rune for decryption
 func RotateLeft(a, b rune) rune {
-	ai := strings.IndexRune(ALPHABET, a)
-	bi := strings.IndexRune(ALPHABET, b)
+	ai := strings.IndexRune(Alphabet, a)
+	bi := strings.IndexRune(Alphabet, b)
 
-	return rune(ALPHABET[(ai-bi+ALPHABET_LEN)%ALPHABET_LEN])
+	return rune(Alphabet[(ai-bi+AlphabetLen)%AlphabetLen])
 }
 
+// RoundRight rotates one message for encryption
 func RoundRight(key, msg []rune) []rune {
 	out := make([]rune, 0, len(msg))
 
@@ -51,7 +59,10 @@ func RoundRight(key, msg []rune) []rune {
 
 		if v == ' ' && alt {
 			ki = 0
-			alt = !alt
+
+			if KeyPositionReset {
+				alt = !alt
+			}
 		} else {
 			ki = (ki + 1) % len(key)
 		}
@@ -60,6 +71,7 @@ func RoundRight(key, msg []rune) []rune {
 	return out
 }
 
+// RoundLeft rotates one message for decryption
 func RoundLeft(key, msg []rune) []rune {
 	out := make([]rune, 0, len(msg))
 
@@ -74,7 +86,10 @@ func RoundLeft(key, msg []rune) []rune {
 
 		if c == ' ' && alt {
 			ki = 0
-			alt = !alt
+
+			if KeyPositionReset {
+				alt = !alt
+			}
 		} else {
 			ki = (ki + 1) % len(key)
 		}
@@ -83,6 +98,7 @@ func RoundLeft(key, msg []rune) []rune {
 	return out
 }
 
+// Encrypt encrypts a message
 func Encrypt(key, msg []rune, rounds ...int) []rune {
 	rds := 1
 
@@ -100,6 +116,7 @@ func Encrypt(key, msg []rune, rounds ...int) []rune {
 	return out
 }
 
+// Decrypt decrypts a message
 func Decrypt(key, msg []rune, rounds ...int) []rune {
 	rds := 1
 
