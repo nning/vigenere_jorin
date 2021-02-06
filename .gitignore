@@ -1,4 +1,7 @@
 /cmd/vigenere-jorin/vigenere-jorin
 /cmd/vigenere-jorin-gtk/vigenere-jorin-gtk
 /cmd/vigenere-jorin-gtk/vigenere_jorin_gtk
+/cmd/vigenere-jorin-wasm/vigenere-jorin-wasm
+/cmd/vigenere-jorin-wasm/vigenere-jorin.wasm
+/cmd/vigenere-jorin-wasm/httpd/httpd
 *~

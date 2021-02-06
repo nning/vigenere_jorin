@@ -1,0 +1,62 @@
+<!doctype html>
+
+<html>
+	<head>
+		<meta charset="utf-8">
+		<script src="https://cdn.jsdelivr.net/gh/golang/go@go1.15.8/misc/wasm/wasm_exec.js"></script>
+		<script>
+			const go = new Go();
+
+			(async () => {
+				const result = await WebAssembly.instantiateStreaming(fetch("vigenere-jorin.wasm"), go.importObject);
+				await go.run(result.instance);
+			})();
+		</script>
+	</head>
+
+	<body>
+		<form>
+			<div>
+				<label for="key">Key</label>
+				<input id="key">
+			</div>
+
+			<div>
+				<label for="msg">Message</label>
+				<input id="msg">
+			</div>
+
+			<div>
+				<label for="encrypt">encrypt</label>
+				<input type="radio" id="encrypt" name="operation" value="encrypt" checked>
+
+				<label for="decrypt">decrypt</label>
+				<input type="radio" id="decrypt" name="operation" value="decrypt">
+			</div>
+
+			<button type="submit">Go</button>
+		</form>
+
+		<div id="result">
+		</div>
+
+		<script>
+			document.querySelector('form').addEventListener('submit', (e) => {
+				e.preventDefault();
+
+				const operation = document.querySelector('[name="operation"]:checked').value;
+				const key = document.querySelector('#key').value;
+				const msg = document.querySelector('#msg').value;
+
+				let result = '';
+				if (operation === 'encrypt') {
+					result = encrypt(key, msg);
+				} else {
+					result = decrypt(key, msg);
+				}
+
+				document.querySelector('#result').innerHTML = result;
+			});
+		</script>
+	</body>
+</html>
