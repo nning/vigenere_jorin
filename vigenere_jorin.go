@@ -5,19 +5,20 @@ import (
 	"unicode"
 )
 
-// Alphabet contains set of possible runes: [A-Z ]
-const DefaultAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ "
+const defaultAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ "
+const defaultAlphabetLen = len(defaultAlphabet)
+const defaultKeyPositionReset = true
+
+// Alphabet contains set of possible runes
+var Alphabet = defaultAlphabet
 
 // AlphabetLen is length of Alphabet
-const DefaultAlphabetLen = len(DefaultAlphabet)
+var AlphabetLen = defaultAlphabetLen
 
 // KeyPositionReset controls whether Key Position Reset is activated
-const DefaultKeyPositionReset = true
+var KeyPositionReset = defaultKeyPositionReset
 
-var Alphabet = DefaultAlphabet
-var AlphabetLen = DefaultAlphabetLen
-var KeyPositionReset = DefaultKeyPositionReset
-
+// SetParameters sets the options alphabet and keyPositionReset for other functions
 func SetParameters(alphabet string, keyPositionReset bool) {
 	Alphabet = alphabet
 	AlphabetLen = len(alphabet)
