@@ -1,0 +1,10 @@
+modes:
+  - name: default
+    alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ '
+    keyPositionReset: true
+  - name: original
+    alphabet: ABCDEFGHIJKLMNOPQRSTUVWXYZ
+    keyPositionReset: false
+  - name: alphanumeric
+    alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789 '
+    keyPositionReset: true

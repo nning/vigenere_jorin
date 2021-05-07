@@ -2,32 +2,99 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strconv"
 
+	"gopkg.in/yaml.v2"
 	"nning.io/go/vigenere_jorin"
 )
 
-func main() {
-	if len(os.Args) != 4 && len(os.Args) != 5 {
-		fmt.Fprintf(os.Stderr, `
-%s <operation> <key> <message> [rounds]
+type mode_t struct {
+	Name             string `yaml:"name"`
+	Alphabet         string `yaml:"alphabet"`
+	KeyPositionReset bool   `yaml:"keyPositionReset"`
+}
 
-  operation    "encrypt" or "decrypt"
-  key          key for operation
-  message      text for operation or "-" for reading from stdin
-  rounds       times to repeat encryption, default 1
+type conf_t struct {
+	Modes []mode_t `yaml:"modes"`
+}
+
+var mode = flag.String("m", "default", "Select mode defined in config.yml")
+
+func printHelp() {
+	fmt.Fprintf(os.Stderr, `
+%s [options] <operation> <key> <message> [rounds]
+
+	operation    "encrypt" or "decrypt"
+	key          Key for operation
+	message      Text for operation or "-" for reading from stdin
+	rounds       Times to repeat operation, default 1
+
+	options      Optional flags
+		-m         Mode (from config.yml)
 
 Key and message will be transformed to only upper case letters and space.
 
 `, os.Args[0])
-		os.Exit(1)
+	os.Exit(1)
+}
+
+func getConfig() *conf_t {
+	var c conf_t
+
+	content, err := ioutil.ReadFile("config.yml")
+	if err != nil {
+		return nil
 	}
 
-	key := vigenere_jorin.Sanitize(os.Args[2])
+	err = yaml.Unmarshal(content, &c)
+	if err != nil {
+		fmt.Printf("%v\n", err)
+	}
 
-	m := os.Args[3]
+	return &c
+}
+
+func main() {
+	args := os.Args
+	argsLen := len(args)
+
+	if argsLen < 4 || argsLen > 7 {
+		printHelp()
+	}
+
+	flag.Parse()
+
+	args = flag.Args()
+	argsLen = len(args)
+
+	if argsLen < 3 || argsLen > 4 {
+		printHelp()
+	}
+
+	config := getConfig()
+	if config != nil {
+		i := 0
+
+		for ; i < len(config.Modes); i++ {
+			if config.Modes[i].Name == *mode {
+				break
+			}
+		}
+
+		if i < len(config.Modes) {
+			vigenere_jorin.SetParameters(config.Modes[i].Alphabet, config.Modes[i].KeyPositionReset)
+		} else {
+			fmt.Fprintf(os.Stderr, "Warning: Mode definition for \"%s\" not found\n", *mode)
+		}
+	}
+
+	key := vigenere_jorin.Sanitize(args[1])
+
+	m := args[2]
 	if m == "-" {
 		m = ""
 
@@ -45,14 +112,14 @@ Key and message will be transformed to only upper case letters and space.
 
 	rounds := 1
 
-	if len(os.Args) == 5 {
-		rounds, _ = strconv.Atoi(os.Args[4])
+	if argsLen == 4 {
+		rounds, _ = strconv.Atoi(args[3])
 	}
 
 	out := make([]rune, len(msg))
 	copy(out, msg)
 
-	switch os.Args[1][0] {
+	switch args[0][0] {
 	case 'e':
 		out = vigenere_jorin.Encrypt(key, out, rounds)
 	case 'd':

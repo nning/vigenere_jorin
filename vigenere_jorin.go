@@ -6,13 +6,23 @@ import (
 )
 
 // Alphabet contains set of possible runes: [A-Z ]
-const Alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ "
+const DefaultAlphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ "
 
 // AlphabetLen is length of Alphabet
-const AlphabetLen = len(Alphabet)
+const DefaultAlphabetLen = len(DefaultAlphabet)
 
 // KeyPositionReset controls whether Key Position Reset is activated
-const KeyPositionReset = true
+const DefaultKeyPositionReset = true
+
+var Alphabet = DefaultAlphabet
+var AlphabetLen = DefaultAlphabetLen
+var KeyPositionReset = DefaultKeyPositionReset
+
+func SetParameters(alphabet string, keyPositionReset bool) {
+	Alphabet = alphabet
+	AlphabetLen = len(alphabet)
+	KeyPositionReset = keyPositionReset
+}
 
 // Sanitize converts lower to upper case and removes non-runes but keeps space
 func Sanitize(in string) []rune {
