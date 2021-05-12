@@ -12,19 +12,21 @@ import (
 	"nning.io/go/vigenere_jorin"
 )
 
-type mode_t struct {
+// Mode represents a mode object in the configuration
+type Mode struct {
 	Name             string `yaml:"name"`
 	Alphabet         string `yaml:"alphabet"`
 	KeyPositionReset bool   `yaml:"keyPositionReset"`
 }
 
-type conf_t struct {
-	Modes []mode_t `yaml:"modes"`
+// Conf represents the top level object in the configuration
+type Conf struct {
+	Modes []Mode `yaml:"modes"`
 }
 
 var mode = flag.String("m", "default", "Select mode defined in config.yml")
 
-func printHelp(config *conf_t) {
+func printHelp(config *Conf) {
 	fmt.Fprintf(os.Stderr, `
 %s [options] <operation> <key> <message> [rounds]
 
@@ -47,8 +49,8 @@ Key and message will be transformed to only upper case letters and space.
 	os.Exit(1)
 }
 
-func getConfig() *conf_t {
-	var c conf_t
+func getConfig() *Conf {
+	var c Conf
 
 	content, err := ioutil.ReadFile("config.yml")
 	if err != nil {
@@ -63,7 +65,7 @@ func getConfig() *conf_t {
 	return &c
 }
 
-func getMode(config *conf_t, name string) *mode_t {
+func getMode(config *Conf, name string) *Mode {
 	i := 0
 
 	for ; i < len(config.Modes); i++ {
@@ -74,12 +76,12 @@ func getMode(config *conf_t, name string) *mode_t {
 
 	if i < len(config.Modes) {
 		return &config.Modes[i]
-	} else {
-		return nil
 	}
+
+	return nil
 }
 
-func getModeNames(config *conf_t) []string {
+func getModeNames(config *Conf) []string {
 	a := make([]string, len(config.Modes))
 
 	for i := 0; i < len(config.Modes); i++ {
