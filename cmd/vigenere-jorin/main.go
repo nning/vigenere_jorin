@@ -24,7 +24,7 @@ type conf_t struct {
 
 var mode = flag.String("m", "default", "Select mode defined in config.yml")
 
-func printHelp() {
+func printHelp(config *conf_t) {
 	fmt.Fprintf(os.Stderr, `
 %s [options] <operation> <key> <message> [rounds]
 
@@ -39,6 +39,11 @@ func printHelp() {
 Key and message will be transformed to only upper case letters and space.
 
 `, os.Args[0])
+
+	if config != nil {
+		fmt.Fprintf(os.Stderr, "Available modes: %v\n\n", getModeNames(config))
+	}
+
 	os.Exit(1)
 }
 
@@ -58,12 +63,40 @@ func getConfig() *conf_t {
 	return &c
 }
 
+func getMode(config *conf_t, name string) *mode_t {
+	i := 0
+
+	for ; i < len(config.Modes); i++ {
+		if config.Modes[i].Name == name {
+			break
+		}
+	}
+
+	if i < len(config.Modes) {
+		return &config.Modes[i]
+	} else {
+		return nil
+	}
+}
+
+func getModeNames(config *conf_t) []string {
+	a := make([]string, len(config.Modes))
+
+	for i := 0; i < len(config.Modes); i++ {
+		a[i] = config.Modes[i].Name
+	}
+
+	return a
+}
+
 func main() {
 	args := os.Args
 	argsLen := len(args)
 
+	config := getConfig()
+
 	if argsLen < 4 || argsLen > 7 {
-		printHelp()
+		printHelp(config)
 	}
 
 	flag.Parse()
@@ -72,21 +105,14 @@ func main() {
 	argsLen = len(args)
 
 	if argsLen < 3 || argsLen > 4 {
-		printHelp()
+		printHelp(config)
 	}
 
-	config := getConfig()
 	if config != nil {
-		i := 0
+		cMode := getMode(config, *mode)
 
-		for ; i < len(config.Modes); i++ {
-			if config.Modes[i].Name == *mode {
-				break
-			}
-		}
-
-		if i < len(config.Modes) {
-			vigenere_jorin.SetParameters(config.Modes[i].Alphabet, config.Modes[i].KeyPositionReset)
+		if mode != nil {
+			vigenere_jorin.SetParameters(cMode.Alphabet, cMode.KeyPositionReset)
 		} else {
 			fmt.Fprintf(os.Stderr, "Warning: Mode definition for \"%s\" not found\n", *mode)
 		}
