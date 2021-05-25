@@ -1,3 +1,5 @@
+defaultMode: alphanumeric
+
 modes:
   - name: default
     alphabet: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ '

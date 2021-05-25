@@ -21,7 +21,8 @@ type Mode struct {
 
 // Conf represents the top level object in the configuration
 type Conf struct {
-	Modes []Mode `yaml:"modes"`
+	DefaultMode string `yaml:"defaultMode"`
+	Modes       []Mode `yaml:"modes"`
 }
 
 var mode = flag.String("m", "default", "Select mode defined in config.yml")
@@ -63,6 +64,14 @@ func getConfig() *Conf {
 	}
 
 	return &c
+}
+
+func getDefaultMode(config *Conf) string {
+	if config.DefaultMode != "" {
+		return config.DefaultMode
+	}
+
+	return "default"
 }
 
 func getMode(config *Conf, name string) *Mode {
@@ -111,6 +120,9 @@ func main() {
 	}
 
 	if config != nil {
+		defaultMode := getDefaultMode(config)
+		mode = &defaultMode
+
 		cMode := getMode(config, *mode)
 
 		if mode != nil {
